@@ -1,9 +1,14 @@
+use aiken/list
+use aiken/transaction.{InlineDatum, ScriptContext, Spend}
+use aiken/transaction/credential.{VerificationKeyCredential}
+use aiken/transaction/value
+
 //                   //
 // Datum && Redeemer //
 //                   //
 
 type MDatum {
-  seller: VerificationKeyCredential,
+  seller: ByteArray,
   price: Int,
 }
 
@@ -22,7 +27,7 @@ validator {
     let ScriptContext { transaction, purpose } = c
     expect Spend(oref) = purpose
 
-    expect ownIn =
+    expect Some(ownIn) =
       list.find(
         transaction.inputs,
         fn(input) { input.output_reference == oref },
@@ -33,12 +38,14 @@ validator {
         expect Some(payment) =
           list.find(
             transaction.outputs,
-            fn(output) { output.address.payment_credential == d.seller },
+            fn(output) {
+              output.address.payment_credential == VerificationKeyCredential(
+                d.seller,
+              )
+            },
           )
 
-        let listing = value.without_lovelace(ownIn.output.value)
-
-        payment.value == d.price
+        value.lovelace_of(payment.value) == d.price
       }
       Edit { price } -> {
         let ownHash = ownIn.output.address.payment_credential
@@ -47,8 +54,7 @@ validator {
           list.find(
             transaction.outputs,
             fn(output) {
-              output.address.payment_credential == ownHash
-              output.value == ownIn.output.value
+              output.address.payment_credential == ownHash && output.value == ownIn.output.value
             },
           )
 
@@ -56,11 +62,11 @@ validator {
         expect mDatum: MDatum = datum
 
         mDatum.seller == d.seller && mDatum.price == price && list.has(
-          extra_signatories,
+          transaction.extra_signatories,
           d.seller,
         )
       }
-      Delist -> list.has(extra_signatories, d.seller)
+      Delist -> list.has(transaction.extra_signatories, d.seller)
     }
   }
 }
