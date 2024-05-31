@@ -1,0 +1,14 @@
+name = "rhystmorgan/aiken-course"
+version = "0.0.0"
+license = "Apache-2.0"
+description = "Aiken contracts for project 'rhystmorgan/aiken-course'"
+
+[repository]
+user = "rhystmorgan"
+project = "aiken-course"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "1.9.0"
+source = "github"
