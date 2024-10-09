@@ -34,8 +34,9 @@ We look at writing tests for our validators to benchmark and understand how the 
 Module 3 - Oracle
 
 This will teach people the most common design pattern of a mintingPolicy & spendingValidator pair
-  -> trusted data sources
-  -> spending to yourself
+  -> Trusted data sources
+  -> Spending to yourself
+  -> Oneshot minting policy pattern
 
 Module 4 - Common Exploits
 
